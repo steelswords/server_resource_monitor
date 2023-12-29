@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-plotly = { version = "0.8.4", features = ["js-sys", "wasm-bindgen", "wasm-bindgen-futures", "wasm"] }
-yew = { version = "0.21.0", features = ["csr"] }
+libc = "0.2.151"
+sys-info = "0.9.1"
