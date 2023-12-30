@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 libc = "0.2.151"
+sensors-sys = { version = "0.2.10", features = ["static"] }
 sys-info = "0.9.1"
