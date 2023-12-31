@@ -1,6 +1,7 @@
 use sys_info;
 use std::time::Duration;
 use std::process::Command;
+#[macro_use] extern crate rocket;
 
 fn get_cpu_temperature() -> Result<String, String>
 {
@@ -60,10 +61,6 @@ Uptime: {}
 ))
 }
 
-pub fn main() {
-    println!("{}", get_system_info());
-}
-
 fn timeval_to_string(time: libc::timeval) -> String {
     let duration = Duration::new(time.tv_sec as u64, time.tv_usec as u32 * 1000);
     let days = duration.as_secs() / 3600 / 24;
@@ -75,4 +72,14 @@ fn timeval_to_string(time: libc::timeval) -> String {
         duration.as_secs() % 60,
         duration.subsec_millis()
     )
+}
+
+#[get("/")]
+fn index() -> String {
+    get_system_info()
+}
+
+#[launch]
+fn rocket() -> _ {
+    rocket::build().mount("/", routes![index])
 }
