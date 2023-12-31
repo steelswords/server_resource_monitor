@@ -1,64 +1,17 @@
 use sys_info;
 use std::time::Duration;
-use sensors_sys::*;
+use std::process::Command;
 
-/*
- * void SensorData::FetchTemp()
+fn get_cpu_temperature() -> Result<String, String>
 {
-    sensors_chip_name const * cn;
-    int c = 0;
-    while ((cn = sensors_get_detected_chips(0, &c)) != 0) {
-        std::cout << "Chip: " << cn->prefix << "/" << cn->path << std::endl;
-
-        sensors_feature const *feat;
-        int f = 0;
-
-        while ((feat = sensors_get_features(cn, &f)) != 0) {
-            std::cout << f << ": " << feat->name << std::endl;
-
-            sensors_subfeature const *subf;
-            int s = 0;
-
-            while ((subf = sensors_get_all_subfeatures(cn, feat, &s)) != 0) {
-                std::cout << f << ":" << s << ":" << subf->name
-                          << "/" << subf->number << " = ";
-                double val;
-                if (subf->flags & SENSORS_MODE_R) {
-                    int rc = sensors_get_value(cn, subf->number, &val);
-                    if (rc < 0) {
-                        std::cout << "err: " << rc;
-                    } else {
-                        std::cout << val;
-                    }
-                }
-                std::cout << std::endl;
-            }
-        }
+    let mut command = Command::new("sensors");
+    match command.output() {
+        Ok(output) => {
+            let stdout_string = String::from_utf8(output.stdout).unwrap();
+            Ok(stdout_string)
+        },
+        Err(_) => Err(String::from("Could not run `sensors`. Is lm-sensors installed?"))
     }
-}
-*/
-fn get_cpu_temperature() -> Result<f64, String>
-{
-    /*
-    unsafe {
-        if 0 != sensors_init(std::ptr::null_mut())
-        {
-            return Err("Could not initialize sensors".to_string());
-        }
-        let mut chip_name: sensors_sys::sensors_chip_name;
-        let mut chip_number = 0;
-        // Loop over all chips libsensors can find
-        while sensors_get_detected_chips(std::ptr::null(), &mut chip_number) != std::ptr::null() {
-            println!("Chip: {}/{}", chip_name.prefix as &str, chip_name.path);
-            chip_number += 1;
-        }
-                     
-
-
-
-    }
-    */
-    Ok(0.0)
 }
 
 fn bytes_to_mebibytes(bytes: u64) -> u64
@@ -73,8 +26,7 @@ fn get_system_info() -> String {
 
     String::from(
         format!(
-r#"CPU temp: {:.2}
-CPU cores: {}
+r#"CPU cores: {}
 CPU speed: {} MHz
 Load 1m:   {} %
 Load 5m:   {} %
@@ -89,8 +41,9 @@ Total processes: {}
 
 ==================
 Uptime: {}
+{}
+
 "#,
-    get_cpu_temperature().expect("Could not get CPU temperature"),
     sys_info::cpu_num().unwrap(),
     sys_info::cpu_speed().unwrap(),
     load_average.one,
@@ -102,6 +55,7 @@ Uptime: {}
 
     sys_info::proc_total().expect("Could not get number of procs"),
     timeval_to_string(sys_info::boottime().expect("Could not get boottime")),
+    get_cpu_temperature().expect("Could not get CPU temperature"),
 
 ))
 }
