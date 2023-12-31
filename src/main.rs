@@ -5,6 +5,8 @@ use std::process::Command;
 
 fn get_cpu_temperature() -> Result<String, String>
 {
+    Ok("0.0".to_string())
+    /*
     let mut command = Command::new("sensors");
     match command.output() {
         Ok(output) => {
@@ -13,6 +15,7 @@ fn get_cpu_temperature() -> Result<String, String>
         },
         Err(_) => Err(String::from("Could not run `sensors`. Is lm-sensors installed?"))
     }
+    */
 }
 
 fn bytes_to_mebibytes(bytes: u64) -> u64
